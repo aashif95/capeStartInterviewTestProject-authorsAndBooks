@@ -1,0 +1,17 @@
+<mat-drawer-container class="example-container" autosize>
+  <mat-drawer #drawer mode="side" opened>
+    <section class="SideNavBar">
+      <ul>
+        <li>
+          <a routerLink="/books" routerLinkActive="active">Books</a>
+        </li>
+        <li>
+          <a routerLink="/authors" routerLinkActive="active">Authors</a>
+        </li>
+      </ul>
+    </section>
+  </mat-drawer>
+  <mat-drawer-content>
+    <router-outlet></router-outlet>
+  </mat-drawer-content>
+</mat-drawer-container>
