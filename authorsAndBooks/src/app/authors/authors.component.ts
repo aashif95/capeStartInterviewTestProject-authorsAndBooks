@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
+import { Router } from "@angular/router";
 
 export interface PeriodicElement {
   _id: string;
@@ -23,7 +24,7 @@ export class AuthorsComponent implements OnInit {
   // displayedColumns: string[] = ['_id', 'title'];
   displayedColumns: string[] = ['_id', 'title'];
   dataSource = ELEMENT_DATA;
-  constructor(private apollo: Apollo) { }
+  constructor(private apollo: Apollo, public router: Router,) { }
 
   ngOnInit(): void {
     this.loadAuthors()
@@ -54,6 +55,12 @@ export class AuthorsComponent implements OnInit {
     this.authorName = ''
 
   }
+
+
+  getRecord(element) {
+    this.router.navigate(['/books'], { queryParams: {authorId: element._id}})
+  }
+
   loadData = (query): any => {
     return new Promise((resolve, reject) => {
       this.apollo.query({
