@@ -24,11 +24,13 @@ export class BooksComponent implements OnInit {
   title: any;
   body: any;
   authorIds: any
+  minPrice: number = 0;
+  maxPrice: number;
   // displayedColumns: string[] = ['_id', 'title'];
-  displayedColumns: string[] = ['_id', 'title', 'body'];
+  displayedColumns: string[] = ['_id', 'title', 'body', 'price'];
   dataSource = ELEMENT_DATA;
   authors: []
-
+  price: any;
   constructor(private apollo: Apollo, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
@@ -41,6 +43,7 @@ export class BooksComponent implements OnInit {
         this.loadBooks()
       }
     });
+    this.loadAuthors()
   }
 
   loadBooks = async(authorId?) => {
@@ -48,13 +51,55 @@ export class BooksComponent implements OnInit {
       books {
         title,
         body,
+        price,
         authorIds,
         _id
       }
-    }`
+    }`;
+
+    if (authorId) {
+      query = gql`query {
+        booksByAuthorIds (authorId:${authorId}) {
+          title,
+          body,
+          price,
+          authorIds,
+          _id
+        }
+      }`
+    }
     const data =  await this.loadData(query)
-    this.dataSource = data.books
-    console.log(this.dataSource)
+    if(authorId) {
+
+      this.dataSource = data.booksByAuthorIds;
+    } else {
+      this.dataSource = data.books;
+    }
+  }
+
+  filter = async () => {
+    let queryObj = `(min: ${this.minPrice}, max: ${this.maxPrice})`;
+    if (this.minPrice && !this.maxPrice) {
+      queryObj = `(min: ${this.minPrice})`;
+    }
+    if (!this.minPrice && this.maxPrice) {
+      queryObj = `(max: ${this.maxPrice})`;
+    }
+
+    if (!this.minPrice && !this.maxPrice) {
+      return
+    }
+    const query = gql`query {
+      booksByPriceRange ${queryObj} {
+        title,
+        body,
+        price,
+        authorIds,
+        _id
+      }
+    }`;
+    const data =  await this.loadData(query)
+    this.dataSource = data.booksByPriceRange;
   }
 
   loadAuthors = async() => {
@@ -71,9 +116,10 @@ export class BooksComponent implements OnInit {
 
   addBook = async () => {
     const query = gql`mutation{
-      createBook(book:{title: ${JSON.stringify(this.title)}, body: ${JSON.stringify(this.body)}, authorIds: [${JSON.stringify(this.authorIds)}]}){
+      createBook(book:{title: ${JSON.stringify(this.title)}, body: ${JSON.stringify(this.body)},  price: ${JSON.stringify(this.price)}, authorIds: [${JSON.stringify(this.authorIds)}]}){
         title,
         body,
+        price,
         authorIds,
         createdAt
       }

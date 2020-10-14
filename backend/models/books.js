@@ -16,6 +16,10 @@ const booksSchema = new Schema(
     authorIds: {
       type: Array,
       required: true
+    },
+    price: {
+      type: Number,
+      required: true
     }
   },
   { timestamps: true }

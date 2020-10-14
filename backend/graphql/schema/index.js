@@ -5,6 +5,7 @@ module.exports = buildSchema(`
   type Author {
     _id: ID!
     title: String!
+    books: [Book]!
     createdAt: String!
   }
 
@@ -18,6 +19,7 @@ module.exports = buildSchema(`
     title: String!
     body: String!
     authorIds: [String]!
+    price: Float!
     createdAt: String!
   }
 
@@ -25,6 +27,7 @@ module.exports = buildSchema(`
   input BookInput {
     title: String!
     body: String!
+    price: Float!
     authorIds: [String]!
   }
 
@@ -32,6 +35,7 @@ module.exports = buildSchema(`
     authors:[Author!]
     books:[Book!]
     booksByAuthorIds (authorId: String):[Book!]
+    booksByPriceRange (min: Float, max: Float):[Book!]
   }
 
   type Mutation {

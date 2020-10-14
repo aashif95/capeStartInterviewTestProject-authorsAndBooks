@@ -5,12 +5,22 @@ const Book = require("../../models/books")
 module.exports = {
   authors: async () => {
     try {
-      const authorsFetched = await Author.find()
+      const authorsFetched = await Author.aggregate([
+    {
+      $lookup:
+         {
+            from: "book",
+            localField: "_id",
+            foreignField: "authorIds",
+            as: "books"
+        }
+      }
+    ])
+      console.log(authorsFetched)
       return authorsFetched.map(author => {
         return {
-          ...author._doc,
-          _id: author.id,
-          createdAt: new Date(author._doc.createdAt).toISOString(),
+          ...author,
+          createdAt: new Date(author.createdAt).toISOString(),
         }
       })
     } catch (error) {
@@ -61,12 +71,35 @@ module.exports = {
     }
   },
 
+  booksByPriceRange: async args => {
+    var query = {price: {$gte: args.min, $lte: args.max}}
+    if (args.min && !args.max) {
+      query = {price: {$gte: args.min}}
+    }
+    if (!args.min && args.max) {
+      query = {price: {$lte: args.max}}
+    }
+    try {
+      const booksFetched = await Book.find(query)
+      return booksFetched.map(book => {
+        return {
+          ...book._doc,
+          _id: book.id,
+          createdAt: new Date(book._doc.createdAt).toISOString(),
+        }
+      })
+    } catch (error) {
+      throw error
+    }
+  },
+
   createBook: async args => {
     try {
-      const { title, body, authorIds } = args.book
+      const { title, body, authorIds, price } = args.book
       const book = new Book({
         title,
         body,
+        price,
         authorIds,
       })
       const newBook = await book.save()
