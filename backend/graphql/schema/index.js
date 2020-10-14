@@ -31,6 +31,7 @@ module.exports = buildSchema(`
   type Query {
     authors:[Author!]
     books:[Book!]
+    booksByAuthorIds (authorId: String):[Book!]
   }
 
   type Mutation {

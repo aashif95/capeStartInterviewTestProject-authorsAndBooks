@@ -46,6 +46,21 @@ module.exports = {
     }
   },
 
+  booksByAuthorIds: async args => {
+    try {
+      const booksFetched = await Book.find({authorIds: {$in: [args.authorId]}})
+      return booksFetched.map(book => {
+        return {
+          ...book._doc,
+          _id: book.id,
+          createdAt: new Date(book._doc.createdAt).toISOString(),
+        }
+      })
+    } catch (error) {
+      throw error
+    }
+  },
+
   createBook: async args => {
     try {
       const { title, body, authorIds } = args.book
